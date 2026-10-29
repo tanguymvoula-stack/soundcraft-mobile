@@ -68,17 +68,17 @@ private fun Studio() {
             Column(Modifier.fillMaxSize().padding(if (desktop) 16.dp else 10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Column {
-                        Text("SOUNDCRAFT", color = Accent, fontSize = 12.sp, fontWeight = FontWeight.Black, letterSpacing = 2.4.sp)
-                        Text("STUDIO / Untitled 01", color = Color.White, fontSize = if (desktop) 21.sp else 18.sp, fontWeight = FontWeight.Bold)
+                        Text("SOUNDCRAFT  [STUDIO]", color = Color.Black, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.sp)
+                        Text("Untitled 01 - Soundcraft", color = Color.Black, fontSize = if (desktop) 18.sp else 16.sp, fontWeight = FontWeight.Bold)
                     }
                     Column(horizontalAlignment = Alignment.End) {
-                        Text(if (desktop) "DESKTOP WORKSPACE" else "TOUCH WORKSPACE", color = Accent, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                        Text("V0.2 UI • OFFLINE-FIRST", color = Muted, fontSize = 9.sp)
+                        Text(if (desktop) "DESKTOP / DEX" else "MOBILE", color = Color.Black, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Text("V0.2 • RETRO UI", color = Muted, fontSize = 9.sp)
                     }
                 }
                 PanelCard("TRANSPORT", "Tempo • signature 4/4") {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Button(onClick = { playing = !playing }, modifier = Modifier.height(38.dp)) {
+                        Button(onClick = { playing = !playing }, modifier = Modifier.height(44.dp).bevel(true), shape = RectangleShape, colors = ButtonDefaults.buttonColors(containerColor = Panel, contentColor = Color.Black)) {
                             Text(if (playing) "■ STOP" else "▶ PLAY", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                         Column(Modifier.weight(1f)) {
@@ -92,8 +92,8 @@ private fun Studio() {
                 }
                 Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     ViewMode.values().forEach { item ->
-                        Surface(color = if (view == item) Accent else Panel, shape = RoundedCornerShape(8.dp), modifier = Modifier.clickable { view = item }) {
-                            Text(item.title, color = if (view == item) Color(0xFF21160B) else Color.White, fontSize = 12.sp, fontWeight = if (view == item) FontWeight.Bold else FontWeight.Medium, modifier = Modifier.padding(horizontal = 13.dp, vertical = 10.dp))
+                        Surface(color = if (view == item) Accent else Panel, shape = RectangleShape, modifier = Modifier.clickable { view = item }.bevel(view != item)) {
+                            Text(item.title, color = if (view == item) Color.White else Color.Black, fontSize = 12.sp, fontWeight = if (view == item) FontWeight.Bold else FontWeight.Medium, modifier = Modifier.padding(horizontal = 13.dp, vertical = 10.dp))
                         }
                     }
                 }
@@ -107,8 +107,8 @@ private fun Studio() {
                             }
                             PanelCard("PISTES", "Sélection") {
                                 listOf("Drums", "Bass", "Synth", "Audio").forEach { name ->
-                                    Surface(color = if (track == name) Color(0xFF3A3026) else Raised, shape = RoundedCornerShape(7.dp), modifier = Modifier.fillMaxWidth().clickable { track = name }) {
-                                        Text(name, color = if (track == name) Accent else Color.White, fontSize = 12.sp, modifier = Modifier.padding(10.dp))
+                                    Surface(color = if (track == name) Accent else Raised, shape = RectangleShape, modifier = Modifier.fillMaxWidth().heightIn(min = 44.dp).clickable { track = name }.bevel(track != name)) {
+                                        Text(name, color = if (track == name) Color.White else Color.Black, fontSize = 12.sp, modifier = Modifier.padding(10.dp))
                                     }
                                 }
                             }
@@ -152,7 +152,7 @@ private fun Workspace(view: ViewMode, track: String, steps: SnapshotStateList<Bo
                     (0..5).forEach { col ->
                         val active = clips[(row * 3 + col / 2).coerceIn(0, clips.lastIndex)] && (col % 2 == 0 || row == 0)
                         val tint = when (row) { 0 -> Drums; 1 -> Bass; 2 -> Synth; else -> Color(0xFF4B5964) }
-                        Box(Modifier.weight(1f).height(42.dp).background(if (active) tint else Raised, RoundedCornerShape(4.dp)).border(1.dp, if (active) tint else Color(0xFF363D47), RoundedCornerShape(4.dp)), contentAlignment = Alignment.Center) {
+                        Box(Modifier.weight(1f).height(42.dp).background(if (active) tint else Raised, RectangleShape).border(1.dp, if (active) tint else Color(0xFF363D47), RectangleShape), contentAlignment = Alignment.Center) {
                             if (active) Text("CLIP", color = Color.White, fontSize = 8.sp, fontWeight = FontWeight.Bold)
                         }
                     }
@@ -164,7 +164,7 @@ private fun Workspace(view: ViewMode, track: String, steps: SnapshotStateList<Bo
             Text("KICK", color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold)
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
                 steps.forEachIndexed { i, active ->
-                    Box(Modifier.weight(1f).height(46.dp).background(if (active) Accent else Raised, RoundedCornerShape(5.dp)).border(1.dp, if (active) Accent else Color(0xFF414956), RoundedCornerShape(5.dp)).clickable { steps[i] = !active }, contentAlignment = Alignment.Center) {
+                    Box(Modifier.weight(1f).height(46.dp).background(if (active) Accent else Raised, RectangleShape).border(1.dp, if (active) Accent else Color(0xFF414956), RectangleShape).clickable { steps[i] = !active }, contentAlignment = Alignment.Center) {
                         Text("${i + 1}", color = if (active) Color(0xFF21160B) else Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                     }
                 }
@@ -175,7 +175,7 @@ private fun Workspace(view: ViewMode, track: String, steps: SnapshotStateList<Bo
             Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     listOf("C5", "B4", "A#4", "A4", "G4", "F4", "E4", "D4").forEach { pitch ->
-                        Box(Modifier.width(35.dp).height(25.dp).background(Panel, RoundedCornerShape(2.dp)), contentAlignment = Alignment.Center) { Text(pitch, color = Color.White, fontSize = 8.sp) }
+                        Box(Modifier.width(35.dp).height(25.dp).background(Panel, RectangleShape), contentAlignment = Alignment.Center) { Text(pitch, color = Color.White, fontSize = 8.sp) }
                     }
                 }
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -184,7 +184,7 @@ private fun Workspace(view: ViewMode, track: String, steps: SnapshotStateList<Bo
                             (0 until 8).forEach { col ->
                                 val index = row * 8 + col
                                 val active = notes[index]
-                                Box(Modifier.weight(1f).height(25.dp).background(if (active) Bass else Raised, RoundedCornerShape(2.dp)).clickable { notes[index] = !active })
+                                Box(Modifier.weight(1f).height(25.dp).background(if (active) Bass else Raised, RectangleShape).clickable { notes[index] = !active })
                             }
                         }
                     }
@@ -195,7 +195,7 @@ private fun Workspace(view: ViewMode, track: String, steps: SnapshotStateList<Bo
         ViewMode.RACK -> Rack(modules, false)
         ViewMode.MIXER -> Mixer()
         ViewMode.AUDIO -> PanelCard("AUDIO", "Enregistrement et édition") {
-            Box(Modifier.fillMaxWidth().height(130.dp).background(Color(0xFF15191F), RoundedCornerShape(8.dp)).border(1.dp, Color(0xFF353D48), RoundedCornerShape(8.dp)), contentAlignment = Alignment.Center) {
+            Box(Modifier.fillMaxWidth().height(130.dp).background(Color(0xFF15191F), RectangleShape).border(1.dp, Color(0xFF353D48), RectangleShape), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("WAVEFORM", color = Accent, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
                     Text("Aucun fichier chargé", color = Muted, fontSize = 11.sp)
@@ -212,9 +212,9 @@ private fun Rack(modules: MutableList<Boolean>, compact: Boolean) {
         val names = listOf("01  Synthesizer", "02  Filter", "03  Delay", "04  Reverb")
         val desc = listOf("Source sonore", "Filtrage", "Répétitions", "Ambiance")
         names.forEachIndexed { i, name ->
-            Surface(color = if (modules[i]) Raised else Color(0xFF171A20), shape = RoundedCornerShape(8.dp), modifier = Modifier.fillMaxWidth().clickable { modules[i] = !modules[i] }) {
+            Surface(color = if (modules[i]) Raised else Color(0xFFB0B0B0), shape = RectangleShape, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable { modules[i] = !modules[i] }.bevel(modules[i])) {
                 Row(Modifier.padding(9.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Box(Modifier.size(8.dp).background(if (modules[i]) Accent else Muted, RoundedCornerShape(4.dp)))
+                    Box(Modifier.size(12.dp).background(if (modules[i]) Color(0xFF008000) else Color(0xFF808080), RectangleShape).border(1.dp, Color(0xFF404040), RectangleShape))
                     Column(Modifier.weight(1f)) {
                         Text(name, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                         Text(desc[i], color = Muted, fontSize = 9.sp)
@@ -235,10 +235,10 @@ private fun Mixer() {
     PanelCard("MIXER", "Contrôles visuels") {
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
             listOf("DRUMS", "BASS", "SYNTH", "MASTER").forEachIndexed { i, label ->
-                Column(Modifier.weight(1f).background(Raised, RoundedCornerShape(7.dp)).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Column(Modifier.weight(1f).background(Raised, RectangleShape).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(label, color = if (i == 3) Accent else Color.White, fontSize = 8.sp, fontWeight = FontWeight.Bold)
-                    Box(Modifier.width(12.dp).height(70.dp).background(Bg, RoundedCornerShape(3.dp)), contentAlignment = Alignment.BottomCenter) {
-                        Box(Modifier.fillMaxWidth().height((70 * levels[i]).dp).background(if (i == 3) Accent else Bass, RoundedCornerShape(3.dp)))
+                    Box(Modifier.width(18.dp).height(80.dp).background(Color(0xFF808080), RectangleShape).border(1.dp, Color.Black, RectangleShape), contentAlignment = Alignment.BottomCenter) {
+                        Box(Modifier.fillMaxWidth().height((80 * levels[i]).dp).background(Color(0xFFB0B0B0), RectangleShape).border(1.dp, Color(0xFF404040), RectangleShape))
                     }
                     Text("${(levels[i] * 100).toInt()}%", color = Color.White, fontSize = 9.sp)
                     Slider(value = levels[i], onValueChange = { levels[i] = it }, modifier = Modifier.height(32.dp))
@@ -251,8 +251,8 @@ private fun Mixer() {
 
 @Composable
 private fun PanelCard(title: String, subtitle: String, content: @Composable ColumnScope.() -> Unit) {
-    Surface(color = Panel, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Surface(color = Panel, shape = RectangleShape, modifier = Modifier.fillMaxWidth().bevel(true)) {
+        Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text("▣", color = Color.Black, fontSize = 12.sp)
