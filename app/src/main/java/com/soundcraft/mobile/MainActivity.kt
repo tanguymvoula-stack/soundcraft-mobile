@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -135,7 +136,7 @@ private fun Studio() {
 }
 
 @Composable
-private fun Workspace(view: ViewMode, track: String, steps: List<Boolean>, notes: List<Boolean>, clips: List<Boolean>, modules: MutableList<Boolean>) {
+private fun Workspace(view: ViewMode, track: String, steps: SnapshotStateList<Boolean>, notes: SnapshotStateList<Boolean>, clips: List<Boolean>, modules: MutableList<Boolean>) {
     when (view) {
         ViewMode.ARRANGEMENT -> PanelCard("ARRANGEMENT", "Timeline • sélection : $track") {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
@@ -160,7 +161,7 @@ private fun Workspace(view: ViewMode, track: String, steps: List<Boolean>, notes
             Text("KICK", color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold)
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
                 steps.forEachIndexed { i, active ->
-                    Box(Modifier.weight(1f).height(46.dp).background(if (active) Accent else Raised, RoundedCornerShape(5.dp)).border(1.dp, if (active) Accent else Color(0xFF414956), RoundedCornerShape(5.dp)).clickable { (steps as? SnapshotStateList<Boolean>)?.set(i, !active) }, contentAlignment = Alignment.Center) {
+                    Box(Modifier.weight(1f).height(46.dp).background(if (active) Accent else Raised, RoundedCornerShape(5.dp)).border(1.dp, if (active) Accent else Color(0xFF414956), RoundedCornerShape(5.dp)).clickable { steps[i] = !active }, contentAlignment = Alignment.Center) {
                         Text("${i + 1}", color = if (active) Color(0xFF21160B) else Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                     }
                 }
@@ -180,7 +181,7 @@ private fun Workspace(view: ViewMode, track: String, steps: List<Boolean>, notes
                             (0 until 8).forEach { col ->
                                 val index = row * 8 + col
                                 val active = notes[index]
-                                Box(Modifier.weight(1f).height(25.dp).background(if (active) Bass else Raised, RoundedCornerShape(2.dp)).clickable { (notes as? SnapshotStateList<Boolean>)?.set(index, !active) })
+                                Box(Modifier.weight(1f).height(25.dp).background(if (active) Bass else Raised, RoundedCornerShape(2.dp)).clickable { notes[index] = !active })
                             }
                         }
                     }
