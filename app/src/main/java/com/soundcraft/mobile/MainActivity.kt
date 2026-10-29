@@ -9,7 +9,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,14 +20,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-private val Bg = Color(0xFF101216)
-private val Panel = Color(0xFF1B2028)
-private val Raised = Color(0xFF252B35)
-private val Accent = Color(0xFFE9A15B)
-private val Muted = Color(0xFF9CA6B4)
-private val Drums = Color(0xFF8A5D36)
-private val Bass = Color(0xFF426F7B)
-private val Synth = Color(0xFF725486)
+private val Bg = Color(0xFFC0C0C0)
+private val Panel = Color(0xFFC0C0C0)
+private val Raised = Color(0xFFC0C0C0)
+private val Accent = Color(0xFF000080)
+private val Muted = Color(0xFF404040)
+private val Drums = Color(0xFF008000)
+private val Bass = Color(0xFF000080)
+private val Synth = Color(0xFF800080)
+private val DarkEdge = Color(0xFF404040)
+private val LightEdge = Color(0xFFFFFFFF)
 
 private enum class ViewMode(val title: String) {
     ARRANGEMENT("Arrangement"), SEQUENCER("Séquenceur"), PIANO("Piano Roll"),
@@ -39,9 +40,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme(colorScheme = darkColorScheme(
+            MaterialTheme(colorScheme = lightColorScheme(
                 primary = Accent, secondary = Bass, background = Bg, surface = Panel,
-                onPrimary = Color(0xFF21160B), onBackground = Color.White, onSurface = Color.White
+                onPrimary = Color.White, onBackground = Color.Black, onSurface = Color.Black
             )) { Studio() }
         }
     }
@@ -216,7 +217,9 @@ private fun Rack(modules: MutableList<Boolean>, compact: Boolean) {
                         Text(name, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                         Text(desc[i], color = Muted, fontSize = 9.sp)
                     }
-                    Text(if (modules[i]) "ON" else "OFF", color = if (modules[i]) Accent else Muted, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                    Box(Modifier.size(42.dp, 32.dp).background(Panel, RectangleShape).bevel(modules[i]), contentAlignment = Alignment.Center) {
+                        Text(if (modules[i]) "ON" else "OFF", color = if (modules[i]) Color(0xFF008000) else Color(0xFF404040), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    }
                 }
             }
         }
@@ -236,7 +239,7 @@ private fun Mixer() {
                         Box(Modifier.fillMaxWidth().height((70 * levels[i]).dp).background(if (i == 3) Accent else Bass, RoundedCornerShape(3.dp)))
                     }
                     Text("${(levels[i] * 100).toInt()}%", color = Color.White, fontSize = 9.sp)
-                    Slider(value = levels[i], onValueChange = { levels[i] = it }, modifier = Modifier.height(24.dp))
+                    Slider(value = levels[i], onValueChange = { levels[i] = it }, modifier = Modifier.height(32.dp))
                 }
             }
         }
@@ -249,10 +252,26 @@ private fun PanelCard(title: String, subtitle: String, content: @Composable Colu
     Surface(color = Panel, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                Text(title, color = Accent, fontSize = 11.sp, fontWeight = FontWeight.Black, letterSpacing = 1.2.sp)
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text("▣", color = Color.Black, fontSize = 12.sp)
+                    Text(title, color = Color.Black, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.sp)
+                }
                 Text(subtitle, color = Muted, fontSize = 10.sp)
             }
             content()
         }
     }
+}
+
+
+/** Classic Windows-style raised/sunken bevel. */
+private fun Modifier.bevel(raised: Boolean): Modifier = this.drawWithContent {
+    drawContent()
+    val light = if (raised) LightEdge else DarkEdge
+    val dark = if (raised) Color(0xFF808080) else LightEdge
+    val stroke = 2.dp.toPx()
+    drawLine(light, Offset(0f, 0f), Offset(size.width, 0f), strokeWidth = stroke)
+    drawLine(light, Offset(0f, 0f), Offset(0f, size.height), strokeWidth = stroke)
+    drawLine(dark, Offset(0f, size.height - stroke / 2), Offset(size.width, size.height - stroke / 2), strokeWidth = stroke)
+    drawLine(dark, Offset(size.width - stroke / 2, 0f), Offset(size.width - stroke / 2, size.height), strokeWidth = stroke)
 }
