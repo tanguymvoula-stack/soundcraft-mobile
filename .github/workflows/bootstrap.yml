@@ -1,0 +1,72 @@
+name: Bootstrap SoundCraft Studio
+
+on:
+  push:
+    branches: [feature/studio-foundation]
+    paths: [soundcraft-studio.zip]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Unpack project from soundcraft-studio.zip
+        run: |
+          set -e
+          unzip -q soundcraft-studio.zip -d /tmp/unpacked
+          # Vide le dépôt, sauf .git, .github (workflows) et le zip
+          find . -mindepth 1 -maxdepth 1 ! -name .git ! -name .github ! -name soundcraft-studio.zip -exec rm -rf {} +
+          # Copie le projet (sans .github : un token de workflow ne peut pas modifier les workflows)
+          (cd /tmp/unpacked/soundcraft-studio && tar cf - --exclude=./.github .) | tar xf -
+          rm soundcraft-studio.zip
+          echo "Taille du keystore : $(stat -c %s app/debug.keystore) octets (attendu : 2666)"
+          test "$(stat -c %s app/debug.keystore)" -eq 2666
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Nouveau projet SoundCraft Studio (fondation)"
+          git push origin HEAD:feature/studio-foundation
+
+      - name: Test du séquenceur natif
+        run: |
+          cd audio/src/test_native
+          g++ -std=c++17 -Wall -Wextra -I../main/cpp sequencer_test.cpp ../main/cpp/sequencer_core.cpp -o seqtest
+          ./seqtest
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+
+      - name: Install platform, build tools, NDK and CMake
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0" "ndk;27.0.12077973" "cmake;3.22.1"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Unit tests (core)
+        run: gradle --no-daemon :core:test
+
+      - name: Build debug APK
+        run: gradle --no-daemon assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: soundcraft-studio-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
